@@ -2,203 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>NoteE</title>
-  <style>
-    /* Base styles */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
-      transition: background 0.3s, color 0.3s;
-    }
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #333333;
-      --accent-color: #007BFF;
-    }
-    .dark {
-      --bg-color: #121212;
-      --text-color: #f1f1f1;
-    }
-    header {
-      padding: 10px 20px;
-      background: var(--accent-color);
-      color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header button {
-      background: #fff;
-      color: var(--accent-color);
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-    #editor {
-      padding: 20px;
-      border-bottom: 1px solid #ccc;
-    }
-    #editor[contenteditable="true"] {
-      min-height: 200px;
-      outline: none;
-    }
-    #notes {
-      padding: 20px;
-    }
-    .note {
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
-      padding: 10px;
-      background: var(--bg-color);
-    }
-    .note-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .note-header h3 {
-      margin: 0;
-    }
-    .note button {
-      margin-left: 5px;
-      cursor: pointer;
-    }
-    #search {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-bottom: 1px solid #ccc;
-      font-size: 16px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Notes & Links</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>Advanced Note App</h1>
-    <div>
-      <button id="toggleMode">Toggle Dark/Light</button>
-      <button id="addNote">Add Note</button>
+  <div class="container">
+    <h1>Cloud Notes & Links</h1>
+    <div id="auth-section">
+      <form id="auth-form">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+      <button id="toggle-auth-mode">Switch to Sign Up</button>
+      <button id="sign-out" style="display: none;">Sign Out</button>
     </div>
-  </header>
-  <input type="text" id="search" placeholder="Search notes...">
-  <div id="editor" contenteditable="true" placeholder="Write your note here..."></div>
-  <section id="notes"></section>
-
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <!-- Firebase Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    // Your Firebase configuration (replace with your own config values)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDZToGB6MubvJlmmeKQ7IeoyNoD6_2a-uE",
-      authDomain: "notess-1af41.firebaseapp.com",
-      projectId: "notess-1af41",
-      storageBucket: "notess-1af41.appspot.com",
-      messagingSenderId: "211928248652",
-      appId: "1:211928248652:web:2b53b4812df32664dfdfe9"
-      measurementId: "G-JLSMRZDGMF"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const notesCollection = db.collection('notes');
-
-    // DOM Elements
-    const editor = document.getElementById('editor');
-    const notesSection = document.getElementById('notes');
-    const toggleModeBtn = document.getElementById('toggleMode');
-    const addNoteBtn = document.getElementById('addNote');
-    const searchInput = document.getElementById('search');
-
-    // Toggle Dark/Light Mode
-    toggleModeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-    });
-
-   addNoteBtn.addEventListener('click', async () => {
-  const content = editor.innerHTML.trim();
-  if (!content) {
-    alert('Please enter some content.');
-    return;
-  }
-
-  try {
-    const noteData = {
-      content: content,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    await notesCollection.add(noteData);
-    editor.innerHTML = ''; // Clear the editor after saving
-    console.log("Note successfully saved!"); // Debugging
-  } catch (error) {
-    console.error("Error saving note: ", error);
-    alert("Failed to save note. Check Firebase setup.");
-  }
-});
-
-    // Render notes
-    function renderNote(doc) {
-      const noteEl = document.createElement('div');
-      noteEl.classList.add('note');
-      noteEl.setAttribute('data-id', doc.id);
-      noteEl.innerHTML = `
-        <div class="note-header">
-          <h3>${new Date(doc.data().createdAt.seconds * 1000).toLocaleString()}</h3>
-          <div>
-            <button class="edit">Edit</button>
-            <button class="delete">Delete</button>
-          </div>
-        </div>
-        <div class="note-content">${doc.data().content}</div>
-      `;
-      // Delete note
-      noteEl.querySelector('.delete').addEventListener('click', async () => {
-        await notesCollection.doc(doc.id).delete();
-      });
-      // Edit note
-      noteEl.querySelector('.edit').addEventListener('click', () => {
-        const newContent = prompt('Edit your note:', doc.data().content);
-        if (newContent !== null) {
-          notesCollection.doc(doc.id).update({ content: newContent });
-        }
-      });
-      notesSection.appendChild(noteEl);
-    }
-
-    // Real-time listener for notes
-    notesCollection.orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-      notesSection.innerHTML = '';
-      snapshot.forEach(doc => {
-        renderNote(doc);
-      });
-    });
-
-    // Search functionality
-    searchInput.addEventListener('input', async (e) => {
-      const query = e.target.value.toLowerCase();
-      const snapshot = await notesCollection.get();
-      notesSection.innerHTML = '';
-      snapshot.forEach(doc => {
-        if (doc.data().content.toLowerCase().includes(query)) {
-          renderNote(doc);
-        }
-      });
-    });
-
-    // Auto-save feature: You can extend this to save periodically
-    let autoSaveTimeout;
-    editor.addEventListener('input', () => {
-      clearTimeout(autoSaveTimeout);
-      autoSaveTimeout = setTimeout(() => {
-        // Auto-save logic can go here (if you want to save drafts)
-        console.log('Auto-saved draft.');
-      }, 2000);
-    });
-  </script>
+    <div id="notes-section" style="display: none;">
+      <h2>Notes</h2>
+      <input type="text" id="note-input" placeholder="Add a new note">
+      <button id="add-note">Add</button>
+      <ul id="notes-list"></ul>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
