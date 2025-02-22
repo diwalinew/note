@@ -5,12 +5,12 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAw6k93As_TuD5ANlHrC7iUMzInhJYZrJE",
+  authDomain: "notee-9f105.firebaseapp.com",
+  projectId: "notee-9f105",
+  storageBucket: "notee-9f105.firebasestorage.app",
+  messagingSenderId: "536264700477",
+  appId: "1:536264700477:web:7c598c8fa00fdf837db054"
 };
 
 // Initialize Firebase
