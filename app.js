@@ -1,70 +1,25 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAw6k93As_TuD5ANlHrC7iUMzInhJYZrJE",
+  authDomain: "notee-9f105.firebaseapp.com",
+  projectId: "notee-9f105",
+  storageBucket: "notee-9f105.firebasestorage.app",
+  messagingSenderId: "536264700477",
+  appId: "1:536264700477:web:7c598c8fa00fdf837db054"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
 // DOM elements
-const authForm = document.getElementById('auth-form');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
-const signOutButton = document.getElementById('sign-out');
-const notesSection = document.getElementById('notes-section');
 const noteInput = document.getElementById('note-input');
 const addNoteButton = document.getElementById('add-note');
 const notesList = document.getElementById('notes-list');
-
-let isLogin = true;
-
-// Toggle authentication mode
-toggleAuthModeButton.addEventListener('click', () => {
-  isLogin = !isLogin;
-  toggleAuthModeButton.textContent = isLogin ? 'Switch to Sign Up' : 'Switch to Login';
-  authForm.querySelector('button').textContent = isLogin ? 'Login' : 'Sign Up';
-});
-
-// Handle authentication form submission
-authForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = emailInput.value;
-  const password = passwordInput.value;
-
-  try {
-    if (isLogin) {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      await createUserWithEmailAndPassword(auth, email, password);
-    }
-  } catch (error) {
-    console.error("Authentication error:", error);
-    alert("Authentication failed: " + error.message);
-  }
-});
-
-// Handle sign out
-signOutButton.addEventListener('click', async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.error("Sign out error:", error);
-    alert("Sign out failed: " + error.message);
-  }
-});
 
 // Handle adding a new note
 addNoteButton.addEventListener('click', async () => {
@@ -80,21 +35,6 @@ addNoteButton.addEventListener('click', async () => {
   }
 });
 
-// Listen for authentication state changes
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    authSection.style.display = 'none';
-    notesSection.style.display = 'block';
-    signOutButton.style.display = 'block';
-    loadNotes();
-  } else {
-    authSection.style.display = 'block';
-    notesSection.style.display = 'none';
-    signOutButton.style.display = 'none';
-    notesList.innerHTML = '';
-  }
-});
-
 // Load notes from Firestore
 function loadNotes() {
   onSnapshot(collection(db, 'notes'), (snapshot) => {
@@ -107,3 +47,6 @@ function loadNotes() {
     });
   });
 }
+
+// Load notes when the page loads
+loadNotes();
