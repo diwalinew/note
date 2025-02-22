@@ -5,12 +5,12 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAw6k93As_TuD5ANlHrC7iUMzInhJYZrJE",
-  authDomain: "notee-9f105.firebaseapp.com",
-  projectId: "notee-9f105",
-  storageBucket: "notee-9f105.firebasestorage.app",
-  messagingSenderId: "536264700477",
-  appId: "1:536264700477:web:7c598c8fa00fdf837db054"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase
@@ -51,7 +51,8 @@ authForm.addEventListener('submit', async (e) => {
       await createUserWithEmailAndPassword(auth, email, password);
     }
   } catch (error) {
-    alert(error.message);
+    console.error("Authentication error:", error);
+    alert("Authentication failed: " + error.message);
   }
 });
 
@@ -60,7 +61,8 @@ signOutButton.addEventListener('click', async () => {
   try {
     await signOut(auth);
   } catch (error) {
-    alert(error.message);
+    console.error("Sign out error:", error);
+    alert("Sign out failed: " + error.message);
   }
 });
 
@@ -72,7 +74,8 @@ addNoteButton.addEventListener('click', async () => {
       await addDoc(collection(db, 'notes'), { text: noteText });
       noteInput.value = '';
     } catch (error) {
-      alert(error.message);
+      console.error("Add note error:", error);
+      alert("Failed to add note: " + error.message);
     }
   }
 });
