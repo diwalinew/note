@@ -119,20 +119,27 @@
       document.body.classList.toggle('dark');
     });
 
-    // Add a new note
-    addNoteBtn.addEventListener('click', async () => {
-      const content = editor.innerHTML.trim();
-      if (!content) {
-        alert('Please enter some content.');
-        return;
-      }
-      const noteData = {
-        content: content,
-        createdAt: new Date()
-      };
-      await notesCollection.add(noteData);
-      editor.innerHTML = '';
-    });
+   addNoteBtn.addEventListener('click', async () => {
+  const content = editor.innerHTML.trim();
+  if (!content) {
+    alert('Please enter some content.');
+    return;
+  }
+
+  try {
+    const noteData = {
+      content: content,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    await notesCollection.add(noteData);
+    editor.innerHTML = ''; // Clear the editor after saving
+    console.log("Note successfully saved!"); // Debugging
+  } catch (error) {
+    console.error("Error saving note: ", error);
+    alert("Failed to save note. Check Firebase setup.");
+  }
+});
 
     // Render notes
     function renderNote(doc) {
